@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#111827" />
+  <title>Crônicas de Eldoria</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #141c30;
+      --panel-2: #1b2740;
+      --text: #edf2ff;
+      --muted: #aab6d3;
+      --gold: #f4c76b;
+      --red: #ef6b73;
+      --green: #64dba3;
+      --blue: #80b9ff;
+      --border: rgba(255,255,255,.10);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(ellipse at top, #1a2b4b 0%, var(--bg) 58%);
+    }
+    .wrap { width: min(1100px, 94vw); margin: 0 auto; padding: 28px 0 44px; }
+    header { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:24px; }
+    .eyebrow { color:var(--gold); text-transform:uppercase; letter-spacing:.2em; font-size:.72rem; font-weight:800; }
+    h1 { margin:.25rem 0 0; font-size:clamp(1.8rem, 4vw, 3rem); letter-spacing:-.04em; }
+    .subtitle { color:var(--muted); margin:.45rem 0 0; max-width:620px; line-height:1.5; }
+    .pill { border:1px solid var(--border); padding:8px 12px; border-radius:999px; color:var(--muted); font-size:.85rem; white-space:nowrap; }
+    .layout { display:grid; grid-template-columns: 1.15fr .85fr; gap:18px; }
+    .panel { background:linear-gradient(145deg, rgba(25,36,60,.96), rgba(16,24,42,.96)); border:1px solid var(--border); border-radius:20px; padding:20px; box-shadow:0 16px 50px rgba(0,0,0,.18); }
+    .panel h2 { margin:0 0 14px; font-size:1.1rem; }
+    .scene {
+      min-height:230px; display:flex; flex-direction:column; justify-content:flex-end; padding:22px;
+      border-radius:16px; overflow:hidden; position:relative;
+      background:linear-gradient(180deg, rgba(7,13,28,.05), rgba(7,13,28,.9)), radial-gradient(circle at 70% 25%, #6079a7 0, transparent 22%), linear-gradient(135deg,#273d5c,#17243c 55%,#10172b);
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .scene::before { content:"✦"; position:absolute; right:12%; top:10%; color:#f4dba0; font-size:2.5rem; opacity:.8; text-shadow:0 0 28px #f4c76b; }
+    .scene h2 { font-size:1.65rem; margin:0 0 8px; }
+    .scene p { margin:0; color:#d0dbf3; line-height:1.55; max-width:680px; }
+    .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px; }
+    .stat { background:rgba(255,255,255,.04); border:1px solid var(--border); border-radius:12px; padding:12px; }
+    .stat small { display:block; color:var(--muted); margin-bottom:5px; }
+    .stat strong { font-size:1.15rem; }
+    .bar { height:7px; background:#303b52; border-radius:20px; overflow:hidden; margin-top:8px; }
+    .bar span { display:block; height:100%; border-radius:20px; transition:width .25s; }
+    .hp { background:var(--red); } .xp { background:var(--blue); }
+    .actions { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:16px; }
+    button { border:1px solid var(--border); background:#24334f; color:var(--text); border-radius:12px; padding:12px 14px; font:inherit; font-weight:700; cursor:pointer; transition:transform .12s, background .12s, border-color .12s; }
+    button:hover:not(:disabled) { transform:translateY(-1px); background:#304365; border-color:rgba(244,199,107,.5); }
+    button:disabled { opacity:.4; cursor:not-allowed; }
+    button.primary { background:var(--gold); color:#241b0a; border-color:transparent; }
+    button.primary:hover:not(:disabled) { background:#ffda8a; }
+    button.danger { background:#492832; }
+    .inventory { display:flex; flex-wrap:wrap; gap:8px; }
+    .item { padding:7px 10px; border-radius:9px; background:rgba(128,185,255,.10); border:1px solid rgba(128,185,255,.22); color:#d6e7ff; font-size:.88rem; }
+    .quest { padding:13px; border:1px solid var(--border); border-radius:12px; background:rgba(255,255,255,.03); margin-bottom:10px; }
+    .quest strong { display:block; margin-bottom:5px; }
+    .quest p { margin:0; color:var(--muted); font-size:.92rem; line-height:1.45; }
+    .quest.done { border-color:rgba(100,219,163,.4); }
+    .quest.done strong { color:var(--green); }
+    .log { height:180px; overflow:auto; display:flex; flex-direction:column; gap:8px; padding-right:5px; }
+    .log p { margin:0; color:#c3cee7; font-size:.9rem; line-height:1.45; padding:9px 11px; border-radius:10px; background:rgba(255,255,255,.035); border-left:2px solid #53698d; }
+    .log p.good { border-color:var(--green); } .log p.warn { border-color:var(--gold); } .log p.bad { border-color:var(--red); }
+    .row-between { display:flex; justify-content:space-between; align-items:center; gap:10px; }
+    .muted { color:var(--muted); }
+    .footer { text-align:center; color:#7382a3; font-size:.8rem; margin-top:22px; }
+    @media (max-width:760px) { .layout { grid-template-columns:1fr; } header { align-items:flex-start; flex-direction:column; } .stats { grid-template-columns:repeat(3,1fr); } .panel { padding:15px; } .actions { grid-template-columns:1fr 1fr; } }
+    @media (max-width:420px) { .stats { grid-template-columns:1fr; } .actions { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <div>
+        <div class="eyebrow">Um RPG de navegador</div>
+        <h1>Crônicas de Eldoria</h1>
+        <p class="subtitle">Explore uma terra esquecida, enfrente criaturas e encontre os fragmentos da antiga coroa.</p>
+      </div>
+      <div class="pill" id="statusPill">Capítulo I · O chamado</div>
+    </header>
+
+    <div class="layout">
+      <section class="panel">
+        <div class="scene">
+          <h2 id="sceneTitle">A vila de Brumafria</h2>
+          <p id="sceneText">O sino da vila toca ao longe. A anciã conta que uma sombra tomou conta da floresta e pede sua ajuda.</p>
+        </div>
+        <div class="stats">
+          <div class="stat">
+            <small>Vida</small><strong id="hpText">30 / 30</strong>
+            <div class="bar"><span class="hp" id="hpBar" style="width:100%"></span></div>
+          </div>
+          <div class="stat">
+            <small>Experiência</small><strong id="xpText">0 / 30 XP</strong>
+            <div class="bar"><span class="xp" id="xpBar" style="width:0%"></span></div>
+          </div>
+          <div class="stat"><small>Nível</small><strong id="levelText">1</strong><div class="muted" id="goldText">12 moedas</div></div>
+        </div>
+        <div class="actions">
+          <button class="primary" id="exploreBtn">Explorar a floresta</button>
+          <button id="restBtn">Descansar (4 moedas)</button>
+          <button id="potionBtn">Usar poção (<span id="potionCount">2</span>)</button>
+          <button id="questBtn">Falar com a anciã</button>
+        </div>
+        <div style="margin-top:16px" class="row-between">
+          <span class="muted" id="locationText">Local: Brumafria</span>
+          <button class="danger" id="resetBtn" style="padding:8px 11px;font-size:.85rem">Recomeçar</button>
+        </div>
+      </section>
+
+      <aside style="display:flex;flex-direction:column;gap:18px">
+        <section class="panel">
+          <h2>Missões</h2>
+          <div class="quest" id="questOne"><strong>O chamado da floresta</strong><p>Explore a floresta e sobreviva ao primeiro encontro.</p></div>
+          <div class="quest" id="questTwo"><strong>Fragmentos perdidos</strong><p>Derrote 3 criaturas para encontrar pistas sobre a coroa.</p></div>
+          <div class="quest" id="questThree"><strong>A sombra antiga</strong><p>Alcance o nível 3 e enfrente o guardião final.</p></div>
+        </section>
+        <section class="panel">
+          <div class="row-between"><h2>Inventário</h2><span class="muted" id="enemyCount">0 vitórias</span></div>
+          <div class="inventory" id="inventory"><span class="item">Espada enferrujada</span><span class="item">Manto de viagem</span><span class="item">2 poções</span></div>
+        </section>
+        <section class="panel">
+          <div class="row-between"><h2>Diário da aventura</h2><span class="muted">Registro</span></div>
+          <div class="log" id="log" aria-live="polite">
+            <p class="good">Sua jornada começa em Brumafria.</p>
+            <p>A anciã observa o caminho da floresta, à espera de uma resposta.</p>
+          </div>
+        </section>
+      </aside>
+    </div>
+    <div class="footer">Crônicas de Eldoria · Feito para jogar no navegador · Progresso salvo neste dispositivo</div>
+  </main>
+  <script>
+    const initialState = () => ({
+      hp: 30, maxHp: 30, xp: 0, level: 1, gold: 12, potions: 2, wins: 0,
+      explored: false, bossDefeated: false, location: "Brumafria", chapter: 1,
+      inventory: ["Espada enferrujada", "Manto de viagem"]
+    });
+    let state;
+    try { state = JSON.parse(localStorage.getItem("eldoria-save")) || initialState(); }
+    catch { state = initialState(); }
+
+    const $ = id => document.getElementById(id);
+    const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+    function save() {
+      try { localStorage.setItem("eldoria-save", JSON.stringify(state)); } catch {}
+    }
+    function log(message, type = "") {
+      const p = document.createElement("p");
+      p.textContent = message;
+      if (type) p.className = type;
+      $("log").prepend(p);
+      while ($("log").children.length > 18) $("log").lastElementChild.remove();
+    }
+    function render() {
+      $("hpText").textContent = `${state.hp} / ${state.maxHp}`;
+      $("hpBar").style.width = `${Math.max(0, state.hp / state.maxHp * 100)}%`;
+      $("xpText").textContent = `${state.xp} / ${state.level * 30} XP`;
+      $("xpBar").style.width = `${Math.min(100, state.xp / (state.level * 30) * 100)}%`;
+      $("levelText").textContent = state.level;
+      $("goldText").textContent = `${state.gold} moedas`;
+      $("potionCount").textContent = state.potions;
+      $("enemyCount").textContent = `${state.wins} vitórias`;
+      $("locationText").textContent = `Local: ${state.location}`;
+      $("statusPill").textContent = state.bossDefeated ? "Final · A coroa restaurada" : `Capítulo ${state.chapter} · ${state.level >= 3 ? "A sombra antiga" : "O chamado"}`;
+      $("potionBtn").disabled = state.potions <= 0 || state.hp === state.maxHp;
+      $("restBtn").disabled = state.gold < 4 || state.hp === state.maxHp;
+      $("exploreBtn").disabled = state.hp <= 0 || state.bossDefeated;
+      $("questBtn").disabled = state.bossDefeated;
+      $("questOne").classList.toggle("done", state.explored);
+      $("questOne").querySelector("p").textContent = state.explored ? "Concluída: você entrou na floresta e enfrentou o perigo." : "Explore a floresta e sobreviva ao primeiro encontro.";
+      $("questTwo").classList.toggle("done", state.wins >= 3);
+      $("questTwo").querySelector("p").textContent = state.wins >= 3 ? "Concluída: os fragmentos apontam para as ruínas." : `Derrote 3 criaturas para encontrar pistas sobre a coroa (${state.wins}/3).`;
+      $("questThree").classList.toggle("done", state.bossDefeated);
+      $("questThree").querySelector("p").textContent = state.bossDefeated ? "Concluída: a sombra foi vencida e a coroa restaurada." : `Alcance o nível 3 e enfrente o guardião final (nível atual: ${state.level}).`;
+      $("sceneTitle").textContent = state.bossDefeated ? "A coroa restaurada" : state.hp <= 0 ? "A aventura interrompida" : state.level >= 3 ? "As ruínas da coroa" : state.location === "Floresta Sombria" ? "A Floresta Sombria" : "A vila de Brumafria";
+      $("sceneText").textContent = state.bossDefeated ? "A luz retorna a Eldoria. Você ergue a coroa restaurada, e a floresta volta a respirar." : state.hp <= 0 ? "Você caiu em batalha. Recomece a aventura para tentar novamente." : state.level >= 3 ? "Entre as pedras antigas, uma presença desperta. O guardião espera por você." : state.explored ? "As árvores sussurram nomes esquecidos. Cada passo pode trazer tesouro ou perigo." : "O sino da vila toca ao longe. A anciã conta que uma sombra tomou conta da floresta e pede sua ajuda.";
+      $("inventory").innerHTML = "";
+      [...state.inventory, ...(state.potions ? [`${state.potions} poção(ões)`] : [])].forEach(item => {
+        const span = document.createElement("span"); span.className = "item"; span.textContent = item; $("inventory").appendChild(span);
+      });
+      save();
+    }
+    function levelUp() {
+      while (state.xp >= state.level * 30) {
+        state.xp -= state.level * 30; state.level++; state.maxHp += 8; state.hp = state.maxHp;
+        state.inventory = state.inventory.filter(i => i !== "Espada enferrujada");
+        if (!state.inventory.includes("Lâmina de Eldoria")) state.inventory.push("Lâmina de Eldoria");
+        log(`Você subiu para o nível ${state.level}! Sua vida foi restaurada e sua arma melhorou.`, "good");
+      }
+    }
+    function explore() {
+      if (state.hp <= 0 || state.bossDefeated) return;
+      state.explored = true;
+      state.location = state.level >= 3 ? "Ruínas Antigas" : "Floresta Sombria";
+      if (state.level >= 3 && state.wins >= 3) {
+        const bossHp = 25 + state.level * 4;
+        const damage = rand(8, 13) + state.level * 2;
+        log(`O Guardião Sombrio surge! Você causa ${damage} de dano.`, "warn");
+        if (damage >= bossHp || state.level >= 4) {
+          state.bossDefeated = true; state.gold += 25; state.xp += 25;
+          log("O guardião cai. A coroa está restaurada: você venceu a aventura!", "good");
+          levelUp(); render(); return;
+        } else {
+          const hit = rand(7, 12);
+          state.hp = Math.max(0, state.hp - hit);
+          log(`O guardião resiste e atinge você por ${hit} de dano. Tente novamente ou se prepare melhor.`, "bad");
+          render(); return;
+        }
+      }
+      const enemies = [
+        { name:"Lobo espectral", hp:rand(7,12), damage:rand(3,7), xp:12, gold:rand(2,6) },
+        { name:"Goblin saqueador", hp:rand(8,13), damage:rand(2,6), xp:10, gold:rand(3,7) },
+        { name:"Aranha de cristal", hp:rand(6,11), damage:rand(4,8), xp:13, gold:rand(1,5) }
+      ];
+      const enemy = enemies[rand(0, enemies.length - 1)];
+      const damage = rand(5,9) + (state.level > 1 ? state.level * 2 : 0);
+      log(`Um ${enemy.name} aparece! Você ataca e causa ${damage} de dano.`, "warn");
+      if (damage >= enemy.hp) {
+        state.wins++; state.xp += enemy.xp; state.gold += enemy.gold;
+        log(`Vitória! Você ganhou ${enemy.xp} XP e ${enemy.gold} moedas.`, "good");
+        if (Math.random() < .22) { state.potions++; log("Você encontrou uma poção pelo caminho.", "good"); }
+      } else {
+        const hit = enemy.damage;
+        state.hp = Math.max(0, state.hp - hit);
+        log(`${enemy.name} ainda está de pé e causa ${hit} de dano.`, "bad");
+        if (Math.random() < .25) { log("Você conseguiu escapar antes de um segundo ataque."); }
+      }
+      if (state.wins >= 3) state.chapter = 2;
+      levelUp(); render();
+    }
+    $("exploreBtn").addEventListener("click", explore);
+    $("restBtn").addEventListener("click", () => {
+      if (state.gold < 4 || state.hp === state.maxHp) return;
+      state.gold -= 4; const heal = Math.min(12, state.maxHp - state.hp); state.hp += heal;
+      log(`Você descansou na estalagem e recuperou ${heal} pontos de vida.`, "good"); render();
+    });
+    $("potionBtn").addEventListener("click", () => {
+      if (state.potions <= 0 || state.hp === state.maxHp) return;
+      state.potions--; const heal = Math.min(15, state.maxHp - state.hp); state.hp += heal;
+      log(`Você usou uma poção e recuperou ${heal} pontos de vida.`, "good"); render();
+    });
+    $("questBtn").addEventListener("click", () => {
+      if (state.wins < 3) log("Anciã: 'A floresta testa quem entra. Vença três criaturas e siga as pistas até as ruínas.'", "warn");
+      else if (state.level < 3) log("Anciã: 'Você está perto. Ganhe experiência e fortaleça-se antes de enfrentar a sombra.'", "warn");
+      else log("Anciã: 'As ruínas estão abertas. Vá, viajante, e encerre esta noite.'", "good");
+    });
+    $("resetBtn").addEventListener("click", () => {
+      if (!confirm("Tem certeza de que deseja recomeçar a aventura? O progresso salvo será apagado.")) return;
+      state = initialState(); $("log").innerHTML = ""; log("Sua jornada recomeça em Brumafria.", "good"); render();
+    });
+    render();
+  </script>
+</body>
+</html>
